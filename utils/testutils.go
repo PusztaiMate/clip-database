@@ -1,4 +1,4 @@
-package api
+package utils
 
 import (
 	"math/rand"
@@ -9,7 +9,7 @@ const (
 	stringCharSet = "abcdefghijklmnopqrstuvwy123456789"
 )
 
-func getRandomString(n int) string {
+func GetRandomString(n int) string {
 	builder := strings.Builder{}
 	for i := 0; i < n; i++ {
 		builder.WriteByte(stringCharSet[rand.Intn(len(stringCharSet))])

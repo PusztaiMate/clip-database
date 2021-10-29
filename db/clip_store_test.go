@@ -1,10 +1,11 @@
-package api
+package db
 
 import (
 	"context"
 	"fmt"
 	"testing"
 
+	"github.com/PusztaiMate/clip-database/utils"
 	"github.com/matryer/is"
 )
 
@@ -14,11 +15,11 @@ func addRandomClip(t *testing.T, store ClipStore) AddClipResults {
 
 	ctx := context.Background()
 	arg := AddClipParams{
-		Subject:   getRandomString(8),
-		VideoUrl:  fmt.Sprintf("http://youtube.com/watch?v=%s", getRandomString(8)),
+		Subject:   utils.GetRandomString(8),
+		VideoUrl:  fmt.Sprintf("http://youtube.com/watch?v=%s", utils.GetRandomString(8)),
 		StartTime: "01:00",
 		EndTime:   "03:00",
-		Tags:      []string{getRandomString(6), getRandomString(6)},
+		Tags:      []string{utils.GetRandomString(6), utils.GetRandomString(6)},
 	}
 
 	result, err := store.AddClip(ctx, arg)

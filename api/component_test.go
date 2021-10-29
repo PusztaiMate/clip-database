@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"github.com/matryer/is"
+
+	"github.com/PusztaiMate/clip-database/db"
 )
 
 const (
@@ -26,14 +28,14 @@ func TestCreateAndRetrieveSingleClip(t *testing.T) {
 	// create new clip
 	is := is.New(t)
 
-	store := NewInMemoryClipStore()
+	store := db.NewInMemoryClipStore()
 	logger := getComponentTestLogger()
 	s := NewServer(store, logger)
 
 	payloadJson := `{
 		"subject": "John Doe",
 		"tags": ["good", "tackle"],
-		"video_url": "http://youtube.com/watch?v=thisistheid123456,
+		"video_url": "http://youtube.com/watch?v=thisistheid123456",
 		"start_time": "00:17",
 		"end_time": "01:43"
 	}`
@@ -44,7 +46,7 @@ func TestCreateAndRetrieveSingleClip(t *testing.T) {
 	s.ServeHTTP(createResponseRecorder, createRequest)
 
 	var createResponse GetClipResponse
-	is.Equal(201, createResponseRecorder.Code)
+	is.Equal(http.StatusCreated, createResponseRecorder.Code)
 	err := json.NewDecoder(createResponseRecorder.Body).Decode(&createResponse)
 	is.NoErr(err)
 	is.True(createResponse.Id > 0)
