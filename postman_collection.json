@@ -1,0 +1,195 @@
+{
+	"info": {
+		"_postman_id": "d8de489a-5d26-4117-8678-2aee22a1ca7f",
+		"name": "ClipDatabase",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AddNew",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"video_url\": \"http://youtube.com/watch?=1234asdf\",\n    \"subject\": \"team\",\n    \"tags\": [\n        \"good\", \"teamwork\", \"switch\"\n    ],\n    \"start_time\": \"01:10\",\n    \"end_time\": \"03:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/clip",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"clip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddNewMissingField",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"subject\": \"team\",\n    \"tags\": [\n        \"good\", \"teamwork\", \"switch\"\n    ],\n    \"start_time\": \"01:10\",\n    \"end_time\": \"03:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/clip",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"clip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetOneSuccessful",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"video_url\": \"http://youtube.com/watch?=1234asdf\",\n    \"subject\": \"team\",\n    \"tags\": [\n        \"good\", \"teamwork\", \"switch\"\n    ],\n    \"start_time\": \"01:10\",\n    \"end_time\": \"03:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/clip/1",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"clip",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetOneUnsuccessful",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"video_url\": \"http://youtube.com/watch?=1234asdf\",\n    \"subject\": \"team\",\n    \"tags\": [\n        \"good\", \"teamwork\", \"switch\"\n    ],\n    \"start_time\": \"01:10\",\n    \"end_time\": \"03:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/clip/9999",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"clip",
+						"9999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetOneInvalid",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"video_url\": \"http://youtube.com/watch?=1234asdf\",\n    \"subject\": \"team\",\n    \"tags\": [\n        \"good\", \"teamwork\", \"switch\"\n    ],\n    \"start_time\": \"01:10\",\n    \"end_time\": \"03:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{scheme}}://{{host}}:{{port}}/clip/invalid",
+					"protocol": "{{scheme}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"clip",
+						"invalid"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "scheme",
+			"value": "http"
+		},
+		{
+			"key": "host",
+			"value": "localhost"
+		},
+		{
+			"key": "port",
+			"value": "8080"
+		}
+	]
+}
