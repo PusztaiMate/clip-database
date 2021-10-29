@@ -7,31 +7,31 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/PusztaiMate/clip-database/db"
+	"github.com/PusztaiMate/clip-database/service"
 	"github.com/go-chi/chi"
 	"github.com/go-playground/validator/v10"
 )
 
 type Server struct {
-	store     db.ClipStore
+	service   *service.ClipperService
 	router    *chi.Mux
 	logger    *log.Logger
 	validator *validator.Validate
 }
 
-func NewServer(store db.ClipStore, logger *log.Logger) *Server {
+func NewServer(service *service.ClipperService, logger *log.Logger) *Server {
 	r := chi.NewRouter()
 	v := validator.New()
 
 	server := Server{
-		store:     store,
+		service:   service,
 		logger:    logger,
 		router:    r,
 		validator: v,
 	}
 
-	r.Get("/clip/{clipId}", server.getSingleClip)
-	r.Post("/clip", server.addClip)
+	r.Get("/clip/{clipId}", server.handlerGetSingleClip)
+	r.Post("/clip", server.handlerAddClip)
 
 	return &server
 }
@@ -40,23 +40,32 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(rw, r)
 }
 
-func (s *Server) getSingleClip(rw http.ResponseWriter, r *http.Request) {
+type getClipResponse struct {
+	Id        int64    `json:"id"`
+	Subject   string   `json:"subject"`
+	VideoUrl  string   `json:"video_url"`
+	StartTime string   `json:"start_time"`
+	EndTime   string   `json:"end_time"`
+	Tags      []string `json:"tags"`
+}
+
+func (s *Server) handlerGetSingleClip(rw http.ResponseWriter, r *http.Request) {
 	clipId, err := getClipIdFromRequest(r)
 	if err != nil {
 		s.writeJsonMessage(rw, "the provided id is not valid", http.StatusBadRequest)
 		return
 	}
 
-	c, err := s.store.GetClip(r.Context(), clipId)
+	c, err := s.service.GetClip(r.Context(), clipId)
 	if err != nil {
 		s.writeJsonMessage(rw, fmt.Sprintf("player with id '%d' not found", clipId), http.StatusNotFound)
 		return
 	}
 
-	clipResponse := GetClipResponse{
+	clipResponse := getClipResponse{
 		Id:        c.Id,
 		Subject:   c.Subject,
-		Url:       c.VideoUrl,
+		VideoUrl:  c.VideoUrl,
 		StartTime: c.StartTime,
 		EndTime:   c.EndTime,
 		Tags:      c.Tags,
@@ -65,20 +74,20 @@ func (s *Server) getSingleClip(rw http.ResponseWriter, r *http.Request) {
 	_ = s.writeJsonOutput(rw, clipResponse, http.StatusOK)
 }
 
-type AddClipRequest struct {
+type addClipRequest struct {
 	Subject   string   `json:"subject" validate:"required"`
-	Url       string   `json:"video_url" validate:"required"`
+	VideoUrl  string   `json:"video_url" validate:"required"`
 	StartTime string   `json:"start_time" validate:"required"`
 	EndTime   string   `json:"end_time" validate:"required"`
 	Tags      []string `json:"tags" validate:"required"`
 }
 
-type AddClipResponse struct {
+type addClipResponse struct {
 	Id int64 `json:"id"`
 }
 
-func (s *Server) addClip(rw http.ResponseWriter, r *http.Request) {
-	var addClipRequest AddClipRequest
+func (s *Server) handlerAddClip(rw http.ResponseWriter, r *http.Request) {
+	var addClipRequest addClipRequest
 	json.NewDecoder(r.Body).Decode(&addClipRequest)
 
 	err := s.validator.Struct(addClipRequest)
@@ -87,15 +96,15 @@ func (s *Server) addClip(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, _ := s.store.AddClip(r.Context(), db.AddClipParams{
+	c, _ := s.service.AddClip(r.Context(), service.AddClipParams{
 		Subject:   addClipRequest.Subject,
-		VideoUrl:  addClipRequest.Url,
+		VideoUrl:  addClipRequest.VideoUrl,
 		StartTime: addClipRequest.StartTime,
 		EndTime:   addClipRequest.EndTime,
 		Tags:      addClipRequest.Tags,
 	})
 
-	response := AddClipResponse{
+	response := addClipResponse{
 		Id: c.Id,
 	}
 	s.writeJsonOutput(rw, response, http.StatusCreated)
@@ -129,13 +138,4 @@ func (s *Server) writeJsonMessage(rw http.ResponseWriter, message string, code i
 	if err != nil {
 		s.logger.Print("could not log message: ", message)
 	}
-}
-
-type GetClipResponse struct {
-	Id        int64    `json:"id"`
-	Subject   string   `json:"subject"`
-	Url       string   `json:"url"`
-	StartTime string   `json:"start_time"`
-	EndTime   string   `json:"end_time"`
-	Tags      []string `json:"tags"`
 }

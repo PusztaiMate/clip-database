@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/PusztaiMate/clip-database/db"
+	"github.com/PusztaiMate/clip-database/service"
 	"github.com/PusztaiMate/clip-database/utils"
 	"github.com/matryer/is"
 )
@@ -27,7 +28,8 @@ func getServerTestLogger() *log.Logger {
 func TestGetClipEndpoint(t *testing.T) {
 	store := db.NewInMemoryClipStore()
 	logger := getServerTestLogger()
-	server := NewServer(store, logger)
+	service := service.NewClipperService(store)
+	server := NewServer(service, logger)
 
 	t.Run("can retrieve a clip that is present in the db", func(t *testing.T) {
 		is := is.New(t)
@@ -47,11 +49,11 @@ func TestGetClipEndpoint(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, getClipUrl(addClipResult.Id), nil)
 		server.ServeHTTP(responseRecorder, request)
 
-		var respone GetClipResponse
+		var respone getClipResponse
 		err = json.NewDecoder(responseRecorder.Body).Decode(&respone)
 		is.NoErr(err)
 		is.Equal(args.Subject, respone.Subject)
-		is.Equal(args.VideoUrl, respone.Url)
+		is.Equal(args.VideoUrl, respone.VideoUrl)
 		is.Equal(args.StartTime, respone.StartTime)
 		is.Equal(args.EndTime, respone.EndTime)
 		is.Equal(args.Tags, respone.Tags)
@@ -81,7 +83,8 @@ func TestGetClipEndpoint(t *testing.T) {
 func TestAddClipEndpoint(t *testing.T) {
 	store := db.NewInMemoryClipStore()
 	logger := getServerTestLogger()
-	server := NewServer(store, logger)
+	service := service.NewClipperService(store)
+	server := NewServer(service, logger)
 
 	type addClipRequest struct {
 		Subject   string   `json:"subject,omitempty"`

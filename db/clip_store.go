@@ -6,6 +6,11 @@ import (
 	"sync"
 )
 
+type ClipStore interface {
+	AddClip(ctx context.Context, args AddClipParams) (AddClipResults, error)
+	GetClip(ctx context.Context, id int64) (*GetClipResult, error)
+}
+
 type AddClipParams struct {
 	Subject   string   `json:"subject"`
 	VideoUrl  string   `json:"url"`
@@ -30,11 +35,6 @@ type GetClipResult struct {
 	StartTime string   `json:"start_time"`
 	EndTime   string   `json:"end_time"`
 	Tags      []string `json:"tags"`
-}
-
-type ClipStore interface {
-	AddClip(ctx context.Context, args AddClipParams) (AddClipResults, error)
-	GetClip(ctx context.Context, id int64) (*GetClipResult, error)
 }
 
 type Clip struct {

@@ -13,6 +13,7 @@ import (
 	"github.com/matryer/is"
 
 	"github.com/PusztaiMate/clip-database/db"
+	"github.com/PusztaiMate/clip-database/service"
 )
 
 const (
@@ -30,7 +31,8 @@ func TestCreateAndRetrieveSingleClip(t *testing.T) {
 
 	store := db.NewInMemoryClipStore()
 	logger := getComponentTestLogger()
-	s := NewServer(store, logger)
+	service := service.NewClipperService(store)
+	s := NewServer(service, logger)
 
 	payloadJson := `{
 		"subject": "John Doe",
@@ -45,7 +47,7 @@ func TestCreateAndRetrieveSingleClip(t *testing.T) {
 
 	s.ServeHTTP(createResponseRecorder, createRequest)
 
-	var createResponse GetClipResponse
+	var createResponse getClipResponse
 	is.Equal(http.StatusCreated, createResponseRecorder.Code)
 	err := json.NewDecoder(createResponseRecorder.Body).Decode(&createResponse)
 	is.NoErr(err)
@@ -58,7 +60,7 @@ func TestCreateAndRetrieveSingleClip(t *testing.T) {
 
 	s.ServeHTTP(retrieveResponseRecorder, retrieveRequest)
 
-	var retrieveResponse AddClipResponse
+	var retrieveResponse addClipResponse
 
 	err = json.NewDecoder(retrieveResponseRecorder.Body).Decode(&retrieveResponse)
 	is.NoErr(err)
